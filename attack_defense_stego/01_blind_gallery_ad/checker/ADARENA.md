@@ -1,12 +1,16 @@
-# ADArena / Hackerdom Integration
+# Tích Hợp ADArena / Hackerdom
 
-## Summary
+## Tổng Quan
 
-`checker/checker.py` uses only Python standard library. It checks SLA and handles dynamic flag placement/retrieval for the Blind Gallery AD service.
+`checker/checker.py` dùng Python standard library để kiểm tra SLA, đặt flag động và đọc lại flag động cho service Blind Gallery AD.
 
-The checker does not contain exploit logic. Attack logic is kept in `solution/exploit.py`.
+Checker không chứa logic khai thác. Logic tấn công mẫu nằm trong:
 
-## Suggested Platform Settings
+```text
+solution/exploit.py
+```
+
+## Cấu Hình Đề Xuất
 
 ```yaml
 max_round: 20
@@ -16,11 +20,11 @@ service_port: 8084
 flag_prefix: blockChainPTIT
 ```
 
-With `round_time: 300` and `flag_lifetime: 5`, a flag should remain valid for about 25 minutes.
+Với `round_time: 300` và `flag_lifetime: 5`, mỗi flag nên còn hợp lệ khoảng 25 phút.
 
-## Exit Codes
+## Exit Code
 
-| Exit code | Meaning |
+| Exit code | Ý nghĩa |
 |---|---|
 | 101 | OK |
 | 102 | CORRUPT |
@@ -28,79 +32,79 @@ With `round_time: 300` and `flag_lifetime: 5`, a flag should remain valid for ab
 | 104 | DOWN |
 | 110 | CHECK FAILED |
 
-## Supported Calling Styles
+## Kiểu Gọi Được Hỗ Trợ
 
-The checker supports both common Hackerdom/ForcAD styles:
+Checker hỗ trợ kiểu gọi phổ biến của Hackerdom/ForcAD:
 
 ```bash
 python checker.py check 10.10.0.5
 python checker.py 10.10.0.5 check
 ```
 
-With explicit local port:
+Khi test local có port cụ thể:
 
 ```bash
 python checker.py check 127.0.0.1 8084
 python checker.py 127.0.0.1 8084 check
 ```
 
-Direct URL is also supported:
+Có thể truyền URL trực tiếp:
 
 ```bash
 python checker.py check http://127.0.0.1:8084
 ```
 
-If no port is provided, the checker uses `SERVICE_PORT`, default `8084`.
+Nếu không truyền port, checker dùng `SERVICE_PORT`, mặc định là `8084`.
 
-## check
+## Mode check
 
 ```bash
 python checker.py check 10.10.0.5
 ```
 
-The checker verifies:
+Checker kiểm tra:
 
-- `/healthz` returns valid JSON with `ok: true`.
-- `/` renders the public gallery.
-- `/image?id=1` renders a public image detail.
-- `/download?file=atrium.jpg` returns a JPEG envelope.
-- `/checker/get` rejects requests without checker token using HTTP 403.
+- `/healthz` trả JSON hợp lệ với `ok: true`.
+- `/` render được gallery public.
+- `/image?id=1` render được chi tiết ảnh public.
+- `/download?file=atrium.jpg` trả về JPEG hợp lệ.
+- `/checker/get` từ chối request thiếu checker token bằng HTTP 403.
 
-## put
+## Mode put
 
-Hackerdom-style:
-
-```bash
-python checker.py put 10.10.0.5 flag_seed_123 'blockChainPTIT{example_flag}' 1
-```
-
-Local simplified style:
+Kiểu Hackerdom:
 
 ```bash
-python checker.py put 127.0.0.1 8084 'blockChainPTIT{example_flag}'
+python checker.py put 10.10.0.5 flag_seed_123 "blockChainPTIT{example_flag}" 1
 ```
 
-The checker sends the flag to `/checker/put` and prints only `flag_id` to stdout. It does not print the passphrase or placement JSON.
-
-## get
-
-Hackerdom-style:
+Kiểu test local:
 
 ```bash
-python checker.py get 10.10.0.5 flag_seed_123 'blockChainPTIT{example_flag}' 1
+python checker.py put 127.0.0.1 8084 "blockChainPTIT{example_flag}"
 ```
 
-Local:
+Checker gửi flag vào `/checker/put` và chỉ in `flag_id` ra stdout. Checker không in passphrase hoặc dữ liệu placement.
+
+## Mode get
+
+Kiểu Hackerdom:
 
 ```bash
-python checker.py get 127.0.0.1 8084 flag_seed_123 'blockChainPTIT{example_flag}'
+python checker.py get 10.10.0.5 flag_seed_123 "blockChainPTIT{example_flag}" 1
 ```
 
-The checker asks `/checker/get` for the flag and compares the returned value with the expected flag.
+Kiểu test local:
 
-## Environment
+```bash
+python checker.py get 127.0.0.1 8084 flag_seed_123 "blockChainPTIT{example_flag}"
+```
 
-Both service and checker use the same `CHECKER_TOKEN`.
+Checker gọi `/checker/get`, nhận flag service extract ra và so sánh với flag expected.
+
+## Biến Môi Trường
+
+Service và checker phải dùng cùng `CHECKER_TOKEN`.
 
 ```bash
 CHECKER_TOKEN=checker-secret
@@ -109,4 +113,4 @@ CHECKER_TIMEOUT=15
 FLAG_PREFIX=blockChainPTIT{
 ```
 
-For production AD, set a strong random `CHECKER_TOKEN` in the checksystem and service environment.
+Khi deploy thật, nên đổi `CHECKER_TOKEN` thành chuỗi bí mật mạnh.
