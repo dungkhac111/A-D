@@ -5,8 +5,9 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY app.py .
+COPY backend/app.py ./backend/app.py
+COPY frontend ./frontend
 ENV PORT=8084
 ENV CHECKER_TOKEN=checker-secret
 EXPOSE 8084
-CMD ["python", "app.py"]
+CMD ["python", "backend/app.py"]

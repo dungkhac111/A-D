@@ -14,7 +14,11 @@ from urllib.parse import parse_qs, urlparse
 
 
 BASE_DIR = Path(__file__).resolve().parent
-DATA_DIR = BASE_DIR / "data"
+SERVICE_DIR = BASE_DIR.parent
+FRONTEND_DIR = SERVICE_DIR / "frontend"
+TEMPLATE_DIR = FRONTEND_DIR / "templates"
+STATIC_DIR = FRONTEND_DIR / "static"
+DATA_DIR = Path(os.environ.get("DATA_DIR", str(SERVICE_DIR / "data")))
 MEDIA_DIR = DATA_DIR / "media"
 DB_PATH = DATA_DIR / "gallery.db"
 CHECKER_TOKEN = os.environ.get("CHECKER_TOKEN", "checker-secret")
@@ -136,27 +140,11 @@ def extract_stego(path, passphrase):
         return out.read_text(encoding="ascii")
 
 
-def page(title, body):
-    return f"""<!doctype html>
-<html lang="vi">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{html.escape(title)}</title>
-    <style>
-      body {{ margin:0; background:#101314; color:#eff6f6; font-family:system-ui,sans-serif; }}
-      main {{ width:min(1080px,calc(100% - 32px)); margin:0 auto; padding:34px 0; }}
-      h1 {{ font-size:clamp(38px,7vw,76px); line-height:.95; }}
-      .grid {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px; }}
-      .card,.detail {{ display:grid; gap:14px; padding:12px; border:1px solid #304044; border-radius:8px; background:#182020; color:inherit; text-decoration:none; }}
-      img {{ width:100%; aspect-ratio:16/10; object-fit:cover; border-radius:6px; background:#20272a; }}
-      code {{ color:#e7c45d; }}
-      p {{ color:#9db0b2; }}
-      a {{ color:#e7c45d; }}
-    </style>
-  </head>
-  <body>{body}</body>
-</html>"""
+def render_template(name, **context):
+    template = (TEMPLATE_DIR / name).read_text(encoding="utf-8")
+    for key, value in context.items():
+        template = template.replace("{{ " + key + " }}", str(value))
+    return template
 
 
 def index_page():
@@ -172,7 +160,7 @@ def index_page():
               <p>{html.escape(description)}</p>
             </a>"""
         )
-    return page("Blind Gallery AD", f"<main><h1>Blind Gallery AD</h1><section class='grid'>{''.join(cards)}</section></main>")
+    return render_template("index.html", cards="".join(cards))
 
 
 def image_page(image_id):
@@ -196,7 +184,7 @@ def image_page(image_id):
         )
     if not cards:
         cards.append("<article class='detail'><h1>No image</h1><p>No public image matched this id.</p></article>")
-    return page("Image Detail", f"<main><a href='/'>Back</a>{''.join(cards)}</main>")
+    return render_template("image.html", records="".join(cards))
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -216,6 +204,9 @@ class Handler(BaseHTTPRequestHandler):
             if not target.is_file():
                 return self.send_bytes(b"file not found\n", "text/plain; charset=utf-8", HTTPStatus.NOT_FOUND)
             return self.send_bytes(target.read_bytes(), "image/jpeg")
+        if path == "/static/style.css":
+            target = STATIC_DIR / "style.css"
+            return self.send_bytes(target.read_bytes(), "text/css; charset=utf-8")
         if path == "/healthz":
             return self.send_bytes(b'{"ok": true}\n', "application/json")
         return self.send_bytes(b"not found\n", "text/plain; charset=utf-8", HTTPStatus.NOT_FOUND)

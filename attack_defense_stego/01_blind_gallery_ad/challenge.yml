@@ -8,6 +8,9 @@ files:
     - service/docker-compose.yml
     - service/backend/Dockerfile
     - service/backend/app.py
+    - service/frontend/templates/index.html
+    - service/frontend/templates/image.html
+    - service/frontend/static/style.css
   checker:
     - checker/checker.py
     - checker/CHECKER_EXPLAIN.md
