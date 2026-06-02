@@ -11,6 +11,7 @@ files:
   checker:
     - checker/checker.py
     - checker/CHECKER_EXPLAIN.md
+    - checker/ADARENA.md
     - checker/adarena_task.yml
   solution:
     - solution/WRITEUP.md

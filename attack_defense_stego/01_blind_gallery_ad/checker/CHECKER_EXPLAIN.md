@@ -1,31 +1,60 @@
 # Checker Explain
 
-Checker có ba mode:
+Checker has three modes:
 
 ```bash
-python3 checker.py check http://host:8084
-python3 checker.py put http://host:8084 'blockChainPTIT{flag}'
-python3 checker.py get http://host:8084 '<flag_id>' 'blockChainPTIT{flag}'
+python checker.py check 127.0.0.1 8084
+python checker.py put 127.0.0.1 8084 'blockChainPTIT{flag}'
+python checker.py get 127.0.0.1 8084 '<flag_id>' 'blockChainPTIT{flag}'
+```
+
+It also supports direct URL mode:
+
+```bash
+python checker.py check http://127.0.0.1:8084
+```
+
+## Role Separation
+
+- `checker/checker.py`: used by organizers/checksystem only. It checks SLA, puts dynamic flags, and gets dynamic flags.
+- `solution/exploit.py`: used for writeup/attack demonstration. It contains exploit logic.
+
+The checker does not leak filename/passphrase placement data to stdout during `put`; it prints only `flag_id`.
+
+## Exit Codes
+
+```text
+101 OK
+102 CORRUPT
+103 MUMBLE
+104 DOWN
+110 CHECK FAILED
 ```
 
 ## check
 
-Kiểm tra service sống và trang public gallery render được.
+The checker verifies:
+
+- `/healthz` returns JSON with `ok: true`.
+- `/` renders the public gallery.
+- `/image?id=1` renders a public image detail.
+- `/download?file=atrium.jpg` returns a JPEG envelope.
+- `/checker/get` rejects requests without `X-Checker-Token`.
 
 ## put
 
-Gọi `/checker/put` với header `X-Checker-Token`.
+The checker calls `/checker/put` with `X-Checker-Token`.
 
-Service sẽ:
+The service then:
 
-- Sinh filename archive.
-- Sinh passphrase.
-- Tạo JPEG cover.
-- Nhúng flag vào JPEG bằng `steghide`.
-- Lưu record private trong bảng `images`.
+- Generates an archive filename.
+- Generates a passphrase.
+- Creates a JPEG cover.
+- Embeds the flag into the JPEG using `steghide`.
+- Stores a private row in the `images` table.
 
 ## get
 
-Gọi `/checker/get` để service extract lại flag từ JPEG theo `flag_id`.
+The checker calls `/checker/get` with `flag_id`, receives the extracted flag, and compares it with the expected flag.
 
-Nếu flag khác expected, checker fail.
+If the value differs, checker returns `CORRUPT`.
