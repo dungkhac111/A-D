@@ -1,0 +1,14 @@
+services:
+  blind-gallery-ad:
+    build: ./backend
+    ports:
+      - "8084:8084"
+    environment:
+      - PORT=8084
+      - CHECKER_TOKEN=checker-secret
+    volumes:
+      - blind-gallery-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  blind-gallery-data:

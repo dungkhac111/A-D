@@ -1,0 +1,37 @@
+id: ad_01_blind_gallery
+name: Blind Gallery AD
+category: Attack/Defense Web Steganography
+difficulty: medium
+type: attack-defense
+files:
+  service:
+    - service/docker-compose.yml
+    - service/backend/Dockerfile
+    - service/backend/app.py
+  checker:
+    - checker/checker.py
+    - checker/CHECKER_EXPLAIN.md
+    - checker/adarena_task.yml
+  solution:
+    - solution/WRITEUP.md
+    - solution/ATTACK.md
+    - solution/DEFENSE.md
+    - solution/exploit.py
+    - solution/defense.patch
+description: |
+  Blind Gallery AD la mot web service gallery noi bo. Checker dat flag dong vao
+  mot anh archive private bang steghide va luu filename/passphrase trong bang images.
+  Root bug la SQL Injection o endpoint /image?id= cho phep attacker dump record
+  non-public, lay filename/passphrase, tai anh va extract flag bang steghide.
+  Defense dung la parameterized query cho /image trong khi van giu checker put/get
+  va chuc nang public gallery hoat dong.
+platform:
+  checker_type: hackerdom
+  checker_timeout: 20
+  puts: 1
+  gets: 2
+  places: 1
+  service_port: 8084
+  round_time: 300
+  max_round: 20
+  flag_lifetime: 5

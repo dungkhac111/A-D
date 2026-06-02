@@ -1,0 +1,7 @@
+name: Blind Gallery AD
+service_port: 8084
+checker: checker.py
+timeout: 20
+puts: 1
+gets: 2
+places: 1

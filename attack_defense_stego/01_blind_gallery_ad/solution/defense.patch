@@ -1,0 +1,13 @@
+*** Begin Patch
+*** Update File: service/backend/app.py
+@@
+-    query = "SELECT title, filename, description FROM images WHERE id = '%s' AND is_public = 1" % image_id
+-    try:
+-        rows = db.execute(query).fetchall()
++    try:
++        safe_id = int(image_id)
++        rows = db.execute(
++            "SELECT title, filename, description FROM images WHERE id = ? AND is_public = 1",
++            (safe_id,),
++        ).fetchall()
+*** End Patch
