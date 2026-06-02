@@ -67,3 +67,13 @@ cat flag.txt
 ```
 
 Kết quả là flag động do checker đặt trong round hiện tại.
+
+## Dùng Exploit Mẫu
+
+Nếu đã biết `flag_id` của round cần lấy:
+
+```bash
+python3 solution/exploit.py http://target:8084 <flag_id>
+```
+
+Nếu không truyền `flag_id`, exploit sẽ thử lấy một record private mới nhất mà nó dump được.
