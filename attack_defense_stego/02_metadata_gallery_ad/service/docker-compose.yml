@@ -1,0 +1,17 @@
+﻿name: 02_metadata_gallery_ad
+services:
+  app:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8085:8085"
+    environment:
+      - PORT=8085
+      - CHECKER_TOKEN=checker-secret
+    volumes:
+      - ad-data:/app/data
+    restart: unless-stopped
+volumes:
+  ad-data:
+

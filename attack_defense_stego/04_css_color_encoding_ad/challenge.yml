@@ -1,0 +1,35 @@
+id: 04_css_color_encoding_ad
+name: CSS Color Encoding AD
+category: Attack/Defense Web Steganography
+difficulty: medium
+type: attack-defense
+files:
+  service:
+    - service/docker-compose.yml
+    - service/backend/Dockerfile
+    - service/backend/app.py
+    - service/frontend/templates/index.html
+    - service/frontend/templates/detail.html
+    - service/frontend/static/style.css
+  checker:
+    - checker/checker.py
+    - checker/CHECKER_EXPLAIN.md
+    - checker/ADARENA.md
+    - checker/adarena_task.yml
+  solution:
+    - solution/WRITEUP.md
+    - solution/ATTACK.md
+    - solution/DEFENSE.md
+    - solution/exploit.py
+description: |
+  CSS Color Encoding AD la bai Attack/Defense Web Steganography. Checker dat flag dong vao service, doi tan cong khai thac be mat web public de lay flag, doi phong thu va dung bug nhung giu checker hoat dong.
+platform:
+  checker_type: hackerdom
+  checker_timeout: 20
+  puts: 1
+  gets: 2
+  places: 1
+  service_port: 8087
+  round_time: 300
+  max_round: 20
+  flag_lifetime: 5

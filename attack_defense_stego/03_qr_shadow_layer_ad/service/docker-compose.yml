@@ -1,0 +1,17 @@
+﻿name: 03_qr_shadow_layer_ad
+services:
+  app:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8086:8086"
+    environment:
+      - PORT=8086
+      - CHECKER_TOKEN=checker-secret
+    volumes:
+      - ad-data:/app/data
+    restart: unless-stopped
+volumes:
+  ad-data:
+

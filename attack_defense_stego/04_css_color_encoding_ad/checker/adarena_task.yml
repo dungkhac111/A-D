@@ -1,0 +1,11 @@
+name: CSS Color Encoding AD
+service_port: 8087
+checker: checker.py
+timeout: 20
+puts: 1
+gets: 2
+places: 1
+max_round: 20
+round_time: 300
+flag_lifetime: 5
+flag_prefix: blockChainPTIT

@@ -1,0 +1,17 @@
+﻿name: 06_badge_printer_ad
+services:
+  app:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8089:8089"
+    environment:
+      - PORT=8089
+      - CHECKER_TOKEN=checker-secret
+    volumes:
+      - ad-data:/app/data
+    restart: unless-stopped
+volumes:
+  ad-data:
+

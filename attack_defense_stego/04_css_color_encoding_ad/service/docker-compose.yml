@@ -1,0 +1,17 @@
+﻿name: 04_css_color_encoding_ad
+services:
+  app:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8087:8087"
+    environment:
+      - PORT=8087
+      - CHECKER_TOKEN=checker-secret
+    volumes:
+      - ad-data:/app/data
+    restart: unless-stopped
+volumes:
+  ad-data:
+
