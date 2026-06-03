@@ -14,12 +14,22 @@ MUMBLE = 103
 DOWN = 104
 CHECK_FAILED = 110
 
-SERVICE_PORT = int(os.environ.get("SERVICE_PORT", "8084"))
 CHECKER_TOKEN = os.environ.get("CHECKER_TOKEN", "checker-secret")
-TIMEOUT = int(os.environ.get("CHECKER_TIMEOUT", "15"))
 FLAG_PREFIX = os.environ.get("FLAG_PREFIX", "blockChainPTIT{")
 
 ACTIONS = {"check", "put", "get"}
+
+
+def env_int(name, default):
+    try:
+        return int(os.environ.get(name, default))
+    except ValueError:
+        print(f"checker failed: invalid integer env {name}={os.environ.get(name)!r}")
+        raise SystemExit(CHECK_FAILED)
+
+
+SERVICE_PORT = env_int("SERVICE_PORT", "8084")
+TIMEOUT = env_int("CHECKER_TIMEOUT", "15")
 
 
 class CheckerError(Exception):
