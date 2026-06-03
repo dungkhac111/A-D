@@ -227,14 +227,23 @@ class Handler(BaseHTTPRequestHandler):
             path = MEDIA_DIR / filename
             make_stego_jpeg(path, flag, passphrase)
             db = connect_db()
-            image_id = random.randint(1000, 999999)
-            db.execute(
-                "INSERT INTO images(id,title,filename,is_public,description,flag_id) VALUES(?,?,?,?,?,?)",
-                (image_id, "Archive Evidence", filename, 0, f"passphrase: {passphrase}", flag_id),
-            )
-            db.execute("INSERT OR REPLACE INTO flags(flag_id,filename,passphrase) VALUES(?,?,?)", (flag_id, filename, passphrase))
-            db.commit()
-            db.close()
+            try:
+                old = db.execute("SELECT filename FROM flags WHERE flag_id=?", (flag_id,)).fetchone()
+                if old:
+                    old_path = MEDIA_DIR / old[0]
+                    if old_path.is_file():
+                        old_path.unlink()
+                db.execute("DELETE FROM images WHERE flag_id=?", (flag_id,))
+                db.execute("DELETE FROM flags WHERE flag_id=?", (flag_id,))
+                cur = db.execute(
+                    "INSERT INTO images(title,filename,is_public,description,flag_id) VALUES(?,?,?,?,?)",
+                    ("Archive Evidence", filename, 0, f"passphrase: {passphrase}", flag_id),
+                )
+                image_id = cur.lastrowid
+                db.execute("INSERT INTO flags(flag_id,filename,passphrase) VALUES(?,?,?)", (flag_id, filename, passphrase))
+                db.commit()
+            finally:
+                db.close()
             body = f'{{"flag_id":"{flag_id}","image_id":{image_id},"filename":"{filename}","passphrase":"{passphrase}"}}\n'
             return self.send_text(body, "application/json")
         if parsed.path == "/checker/get":
